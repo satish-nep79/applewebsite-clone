@@ -3,6 +3,10 @@ import { hightlightsSlides } from "../constants";
 import gsap from "gsap";
 import { pauseImg, playImg, replayImg } from "../utils";
 import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger"; // Import ScrollTrigger
+
+// Register the ScrollTrigger plugin
+gsap.registerPlugin(ScrollTrigger);
 
 type VideoState = {
   isEnd: boolean;
@@ -66,14 +70,16 @@ const VideoCarousel = () => {
   useEffect(() => {
     let currentProgess = 0;
     let span = videoSpanRef.current;
-    if (span[videoId]) {
+    let videoDiv = videoDivRef.current;
+
+    if (span[videoId] && videoDiv[videoId]) {
       // Animate the progress of the video
       let anim = gsap.to(span[videoId], {
         onUpdate: () => {
           const progress = Math.ceil(anim.progress() * 100);
-          if (progress != currentProgess) {
+          if (progress !== currentProgess) {
             currentProgess = progress;
-            gsap.to(videoDivRef.current[videoId], {
+            gsap.to(videoDiv[videoId], {
               width:
                 window.innerWidth < 760
                   ? "10vw"
@@ -89,7 +95,7 @@ const VideoCarousel = () => {
         },
         onComplete: () => {
           if (isPlaying) {
-            gsap.to(videoDivRef.current[videoId], {
+            gsap.to(videoDiv[videoId], {
               width: "12px",
             });
             gsap.to(span[videoId], {
@@ -98,6 +104,7 @@ const VideoCarousel = () => {
           }
         },
       });
+
       if (videoId === 0) {
         anim.restart();
       }
@@ -107,13 +114,14 @@ const VideoCarousel = () => {
 
         anim.progress(currentTime / duration);
       };
+
       if (isPlaying) {
         gsap.ticker.add(animeUpdate);
       } else {
         gsap.ticker.remove(animeUpdate);
       }
     }
-  }, [videoId, StartPlay]);
+  }, [videoId, StartPlay, isPlaying]);
 
   const handleProcess = (type: string, i: number = video.videoId) => {
     switch (type) {
@@ -179,8 +187,9 @@ const VideoCarousel = () => {
                     }));
                   }}
                   onLoadedData={(e) => handleLoadedData(i, e)}
-                  className={`${slide.id === 2 && "translate-x-44"} 
-                  pointer-events-none`}
+                  className={`${
+                    slide.id === 2 && "translate-x-44"
+                  } pointer-events-none`}
                 >
                   <source src={slide.video} type="video/mp4" />
                 </video>
