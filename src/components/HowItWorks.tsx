@@ -5,7 +5,7 @@ import gsap from 'gsap';
 import { animateWithGsap } from '../utils/animations';
 
 const HowItWorks = () => {
-  const videoRef = useRef();
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useGSAP(() => {
     gsap.from('#chip', {
@@ -26,7 +26,9 @@ const HowItWorks = () => {
           start: '-10% bottom',
         },
         onComplete: () => {
-          videoRef.current.play();
+          if (videoRef.current) {
+            videoRef.current.play();
+          }
         }
       })
 
